@@ -1,0 +1,7 @@
+[org.gnome.desktop.interface]
+color-scheme='prefer-dark'
+show-battery-percentage=true
+
+[org.gnome.settings-daemon.plugins.power]
+ambient-enabled = false
+sleep-inactive-battery-timeout = 600

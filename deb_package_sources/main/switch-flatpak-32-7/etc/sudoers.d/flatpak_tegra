@@ -1,0 +1,1 @@
+Defaults      env_keep += FLATPAK_GL_DRIVERS

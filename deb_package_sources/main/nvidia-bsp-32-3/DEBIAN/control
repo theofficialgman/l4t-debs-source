@@ -1,0 +1,13 @@
+Package: nvidia-bsp-32-3
+Version: 1.0-6
+Architecture: all
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Depends: nvidia-l4t-configs (= 32.3.1-20191209225816), nvidia-l4t-init (= 32.3.1-20191209225816), nvidia-l4t-firmware (= 32.3.1-20191209225816), nvidia-l4t-core (= 32.3.1-20191209225816), nvidia-l4t-3d-core (= 32.3.1-20191209225816), nvidia-l4t-cuda (= 32.3.1-20191209225816), nvidia-l4t-multimedia (= 32.3.1-20191209225816), nvidia-l4t-multimedia-utils (= 32.3.1-20191209225816), nvidia-l4t-oem-config (= 32.3.1-20191209225816), notify-osd
+Conflicts: nvidia-l4t-tools, nvidia-bsp-32-7, switch-flatpak-32-7, switch-bsp (<< 5.1.2-12)
+Breaks: nvidia-l4t-firmware (>> 32.3.1-20191209225816)
+Replaces: nvidia-l4t-tools, nvidia-bsp-32-7
+Provides: nvidia-l4t-tools (= 32.3.1-20191209225816)
+Section: embedded
+Priority: required
+Homepage: https://gitlab.com/switchroot
+Description: L4T BSP 32.3.1 Meta Package

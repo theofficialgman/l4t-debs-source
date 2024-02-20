@@ -1,0 +1,11 @@
+Package: switch-bsp
+Version: 5.1.2-13
+Architecture: all
+Maintainer: CTCaer <ctcaer@gmail.com>
+Changed-By: theofficialgman <dofficialgman@gmail.com>
+Pre-Depends: nvidia-bsp-32-3 | nvidia-bsp-32-7
+Suggests: switch-kernel-headers
+Section: embedded
+Priority: required
+Homepage: https://gitlab.com/switchroot
+Description: Switch L4T Bootstack and Kernel Support

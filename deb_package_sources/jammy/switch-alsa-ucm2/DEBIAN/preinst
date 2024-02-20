@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [ upgrade != "$1" ]; then
+    dpkg-divert --package switch-alsa-ucm2 --add --rename \
+        --divert /usr/share/alsa/ucm2/Tegra/tegra-hda/tegra-hda-HiFi.conf.orig /usr/share/alsa/ucm2/Tegra/tegra-hda/tegra-hda-HiFi.conf
+fi

@@ -1,0 +1,7 @@
+SUBSYSTEM!="switch", GOTO="pd_end"
+KERNEL!="pd", GOTO="pd_end"
+
+ATTRS{state}=="1", TEST=="/usr/bin/dock-hotplug", RUN+="/usr/bin/dock-hotplug 1"
+ATTRS{state}=="0", TEST=="/usr/bin/dock-hotplug", RUN+="/usr/bin/dock-hotplug 1"
+
+LABEL="pd_end"

@@ -1,0 +1,8 @@
+Package: switch-sddm-rule
+Version: 1.0-1
+Architecture: all
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Section: embedded
+Priority: required
+Homepage: https://gitlab.com/switchroot
+Description: Udev rules to allow sddm to initialize on Tegra Drivers

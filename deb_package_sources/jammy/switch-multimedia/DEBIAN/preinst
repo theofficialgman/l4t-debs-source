@@ -1,0 +1,9 @@
+#!/bin/bash
+
+divert() {
+    dpkg-divert --package switch-multimedia --add --rename --divert "${1}.orig" "$1"
+}
+
+if [ upgrade != "$1" ] || dpkg --compare-versions "$2" lt 1.0-1; then
+    divert /usr/share/metainfo/smplayer.appdata.xml
+fi

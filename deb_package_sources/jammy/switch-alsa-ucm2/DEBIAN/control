@@ -1,0 +1,9 @@
+Package: switch-alsa-ucm2
+Version: 1.0-1
+Architecture: all
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Depends: libasound2-data
+Section: embedded
+Priority: optional
+Homepage: https://gitlab.com/switchroot
+Description: ALSA UCM2 configuration for the Nintendo Switch

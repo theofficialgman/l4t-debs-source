@@ -1,0 +1,10 @@
+Package: switch-kde
+Version: 1.0-6
+Architecture: arm64
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Depends: plasma-desktop, plasma-discover-backend-flatpak, switch-sddm-rule
+Conflicts: plasma-discover-backend-snap, plasma-discover-backend-fwupd
+Section: embedded
+Priority: required
+Homepage: https://gitlab.com/switchroot
+Description: Metapackage for KDE only Nintendo Switch configuration packages

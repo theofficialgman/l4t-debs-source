@@ -1,0 +1,9 @@
+Package: switch-multimedia
+Version: 1.0-1+24.04~0
+Architecture: arm64
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Depends: mpv, smplayer, smplayer-themes, yt-dlp
+Section: graphics
+Priority: extra
+Homepage: https://gitlab.com/switchroot
+Description: Metapackage for all Nintendo Switch Multimedia Packages

@@ -1,0 +1,5 @@
+#!/bin/bash
+status=$(gsettings get org.gnome.shell.extensions.improvedosk toggle)
+if [[ ${status} == "true" ]]; then toggle="false"
+else toggle="true"; fi
+gsettings set org.gnome.shell.extensions.improvedosk toggle ${toggle}

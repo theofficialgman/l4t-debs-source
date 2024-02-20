@@ -1,0 +1,9 @@
+Package: switch-dconf-customizations
+Version: 1.0-2
+Architecture: all
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Depends: dconf-cli
+Section: embedded
+Priority: required
+Homepage: https://gitlab.com/switchroot/
+Description: Application configs for the Nintendo Switch

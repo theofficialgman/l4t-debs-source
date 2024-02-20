@@ -1,0 +1,32 @@
+/* Removes keyboard background transparency */
+#keyboard {
+      background-color: #000000;
+}
+
+/* Changes modifier keys bg-color when latched */
+.control-key-latched #keyboard .keyboard-key.default-key.control-key,
+.super-key-latched #keyboard .keyboard-key.default-key.super-key,
+.alt-key-latched #keyboard .keyboard-key.default-key.alt-key,
+#keyboard .keyboard-key.default-key.shift-key-uppercase {
+      background-color: #55a54c;
+}
+
+#keyboard .keyboard-key.default-key.enter-key {
+      border-color: #55a54c;
+      background-color: #55a54c;
+}
+#keyboard .keyboard-key.default-key.enter-key:active {
+      border-color: #43823c;
+      background-color: #43823c;
+}
+
+/* Explicitly sets modifier keys bg-color, see issues #12 & #17 for details */
+#keyboard .keyboard-key.default-key {
+      color: #fff;
+      border-color: #2c2c2c;
+      background-color: #2c2c2c;
+}
+#keyboard .keyboard-key.default-key:active {
+      border-color: #121212;
+      background-color: #121212;
+}

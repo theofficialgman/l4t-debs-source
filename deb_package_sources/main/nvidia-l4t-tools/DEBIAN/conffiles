@@ -1,0 +1,3 @@
+/etc/nvpmodel/nvpmodel_t210.conf
+/etc/nvpmodel/nvpmodel_t210_jetson-nano.conf
+/etc/xdg/autostart/nvpmodel_indicator.desktop

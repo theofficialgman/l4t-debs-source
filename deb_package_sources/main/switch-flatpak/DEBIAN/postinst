@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if ! flatpak list | grep -qF "org.freedesktop.Platform.GL.nvidia-tegra-32-3-1"; then
+	flatpak install --system /opt/switchroot/flatpak/org.freedesktop.Platform.GL.nvidia-tegra-32-3-1.flatpak -y
+	flatpak pin --system runtime/org.freedesktop.Platform.GL.nvidia-tegra-32-3-1.flatpak/aarch64/1.4
+else
+	flatpak uninstall "org.freedesktop.Platform.GL.nvidia-tegra-32-3-1" -y
+	flatpak pin --remove runtime/org.freedesktop.Platform.GL.nvidia-tegra-32-3-1.flatpak/aarch64/1.4 || true
+	flatpak install --system /opt/switchroot/flatpak/org.freedesktop.Platform.GL.nvidia-tegra-32-3-1.flatpak -y
+	flatpak pin --system runtime/org.freedesktop.Platform.GL.nvidia-tegra-32-3-1.flatpak/aarch64/1.4
+fi
+
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+flatpak override --device=all --share=network --filesystem=/sys
+
+[ -d /home ] && cd /home && for user in *; do
+	su - $user -c "flatpak override --user --device=all --share=network --filesystem=/sys" || true
+done || true

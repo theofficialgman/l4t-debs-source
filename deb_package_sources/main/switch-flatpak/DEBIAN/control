@@ -1,0 +1,10 @@
+Package: switch-flatpak
+Version: 1.0-5
+Architecture: arm64
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Pre-Depends: flatpak
+Depends: gnome-software-plugin-flatpak | plasma-discover-backend-flatpak
+Section: embedded
+Priority: required
+Homepage: https://gitlab.com/switchroot
+Description: Switch L4T Flatpak Support

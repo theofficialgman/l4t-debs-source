@@ -1,0 +1,11 @@
+Package: nvidia-l4t-tools
+Version: 32.3.1-20191209225816
+Architecture: arm64
+Maintainer: NVIDIA Corporation
+Installed-Size: 306
+Pre-Depends: nvidia-l4t-ccp-t210ref
+Depends: libc6, libstdc++6, nvidia-l4t-core (= 32.3.1-20191209225816)
+Section: Utils
+Priority: standard
+Homepage: http://developer.nvidia.com/jetson
+Description: NVIDIA Public Test Tools Package

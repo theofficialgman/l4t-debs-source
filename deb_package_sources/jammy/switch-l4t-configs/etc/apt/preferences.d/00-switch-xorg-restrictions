@@ -1,0 +1,17 @@
+# Disallow xorg-core, xserver-xorg-video-*, xserver-xorg-input-libinput, and xserver-xorg-input-libinput-dev from distro
+# Distro versions are too new for Nvidia BSP
+Package: xserver-xorg-core
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: xserver-xorg-video-*
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: xserver-xorg-input-libinput
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: xserver-xorg-input-libinput-dev
+Pin: release o=Ubuntu*
+Pin-Priority: -1

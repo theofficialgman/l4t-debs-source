@@ -1,0 +1,115 @@
+#!/bin/bash
+
+dock_hotplug_handle() {
+  # Set DISPLAY needed for everything.
+  if [ -e "/tmp/.X11-unix/X1" ]; then export DISPLAY=":1"; else export DISPLAY=":0"; fi
+
+  # User name is important for rotation and must always be filled in. Users with pulse are preferred.
+  # Try logged-in user.
+  export DH_USER_NAME=$(who | awk -v vt="$DISPLAY" '$0 ~ vt {print $1}' | head -n 1)
+  # Try gdm greeter.
+  if [ "$DH_USER_NAME" == "" ]; then export DH_USER_NAME=gdm; fi
+  # Nothing was found. Use root to at least let sudo user xrandr commands to succeed.
+  # if [ "$DH_USER_NAME" == "" ]; then export DH_USER_NAME=root; fi
+  export DH_USER_ID=$(id -u "$DH_USER_NAME")
+
+  # Set pulse server. If user failed to be found then pactl cmds will fail. And it's fine.
+  export DH_PULSE_SERVER="unix:/run/user/"$DH_USER_ID"/pulse/native"
+
+  # Set xdg runtime directory for wpctl. If user failed to be found then pactl cmds will fail. And it's fine.
+  export DH_XDG_RUNTIME_DIR="/run/user/"$DH_USER_ID""
+
+  # Set xorg vars.
+  export DP_SETTINGS=
+  export DSI_SETTINGS="--primary --mode 720x1280 --rotate left --panning 1280x720+0+0 --pos 0x0 --dpi 120 --fb 1280x720"
+  export XAUTHORITY=$(ps -C Xorg -f --no-header | sed -n 's/.*-auth //; s/ -[^ ].*//; p')
+
+  # check if is KDE
+  [ -e /var/run/user/1000/kdeinit5__0 ] && DE=KDE
+
+  # Set DP output vars.
+  if [[ "$1" -eq 1 ]]; then
+    # Read custom WIDTHxHEIGHT from dock-hotplug.conf.
+    if [ -e "/etc/dock-hotplug.conf" ]; then
+      export DP_SETTINGS=$(cat /etc/dock-hotplug.conf)
+    fi
+    # No custom res, set max.
+    if [ "$DP_SETTINGS" == "" ]; then
+      DP_SETTINGS=$(xrandr -q | sed -E -n '/DP-0/s/.* ([0-9]+x[0-9]+)\+.*/\1/p')
+    fi
+    # If res found set it, otherwise auto. It's impossible to reach auto, but just in case.
+    if [ "$DP_SETTINGS" == "" ]; then
+      export DP_SETTINGS="--primary --auto"
+    else
+      export DP_SETTINGS="--primary --mode "$DP_SETTINGS" --panning "$DP_SETTINGS"+0+0 --pos 0x0 --fb "$DP_SETTINGS""
+    fi
+  fi
+
+  # Configure Video and Audio. TODO: Don't change audio card profile if headphones, but also keep order.
+  if [[ "$1" -eq 1 ]]; then
+    # DP output.
+    gsettings set org.gnome.settings-daemon.plugins.xsettings rgba-order rgb
+    if [[ -x $(command -v pactl) ]] && ! pactl --server "$DH_PULSE_SERVER" info | grep -q "^Server Name:.*PipeWire"; then
+      sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 1 off
+      sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 0 output:hdmi-stereo
+    else
+      sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl set-default $(sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl status | grep "Built-in Audio Digital Stereo (HDMI)" | grep "\d+" -Po | head -n 1)
+    fi
+    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":0" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+    # Reapply config to avoid X stubbornness.
+    sleep 0.2
+    [ "$DE" != KDE ] && DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+    [ "$DE" != KDE ] && DISPLAY=":0" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+  else
+    # DSI output.
+    gsettings set org.gnome.settings-daemon.plugins.xsettings rgba-order vbgr
+    sudo -u "$DH_USER_NAME" xinput enable "touchscreen"
+    if [[ -x $(command -v pactl) ]] && ! pactl --server "$DH_PULSE_SERVER" info | grep -q "^Server Name:.*PipeWire"; then
+      sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 1 HiFi
+      sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 0 off
+    else
+      sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl set-default $(sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl status | grep "Built-in Audio Speaker playback + Headphones playback" | grep "\d+" -Po | head -n 1)
+    fi
+    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":1" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
+    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":0" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
+    # Reapply config to avoid X stubbornness.
+    sleep 0.2
+    [ "$DE" != KDE ] && DISPLAY=":1" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
+    [ "$DE" != KDE ] && DISPLAY=":0" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
+  fi
+
+  # On dock touch is still rotated, so we rotate it the same amount.
+  xinput set-prop "touchscreen" --type=float "Coordinate Transformation Matrix" 0 -1 1 1 0 0 0 0 1
+
+  # Execute custom dock-hotplug.sh.
+  # This can override everything. All env vars are passed over because of exporting.
+  if [ -e "/etc/dock-hotplug.sh" ]; then
+    /bin/bash /etc/dock-hotplug.sh
+  fi
+
+  sleep 0.8
+}
+
+# Main call.
+DP_ENABLED=0
+NVP_SET_ONLY=0
+
+if [ -e "/sys/class/switch/dp/state" ]; then
+  if grep -q 1 "/sys/class/switch/dp/state"; then DP_ENABLED=1; fi
+fi
+
+if [[ "$NVP_SET_ONLY" -eq 0 ]]; then
+  # Prepare CEC info.
+  CEC_DISABLE=$(sed -ne 's/.*cec_disable=//;T' -e 's/\s.*$//p' /proc/cmdline)
+  if [[ ! -n ${CEC_DISABLE} ]]; then CEC_DISABLE=0; fi
+  if [[ -e "/sys/class/switch/dp/state" ]] && [[ ! ${CEC_DISABLE} -eq 1 ]]; then
+    if [[ "$DP_ENABLED" -eq 0 ]]; then
+      cec-ctl -C
+    else cec-ctl -s -o NintendoSwitch --playback --active-source phys-addr="$(cec-ctl | sed -n 's/.*Physical Address.*: //p')"; fi
+  fi
+
+  # Configure dock.
+  dock_hotplug_handle $DP_ENABLED &
+  disown
+fi

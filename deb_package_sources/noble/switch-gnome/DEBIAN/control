@@ -1,0 +1,10 @@
+Package: switch-gnome
+Version: 1.0-6+24.04~0
+Architecture: arm64
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Depends: gnome-shell, gnome-software-plugin-flatpak, qt5-gtk2-platformtheme, fuse3, libfuse2
+Conflicts: gnome-software-plugin-snap
+Section: embedded
+Priority: required
+Homepage: https://gitlab.com/switchroot
+Description: Metapackage for GNOME only Nintendo Switch configuration packages

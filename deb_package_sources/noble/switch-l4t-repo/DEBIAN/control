@@ -1,0 +1,8 @@
+Package: switch-l4t-repo
+Version: 1.0-0+24.04
+Architecture: all
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Section: embedded
+Priority: required
+Homepage: https://github.com/theofficialgman/l4t-debs
+Description: L4T Apt Repo and Key

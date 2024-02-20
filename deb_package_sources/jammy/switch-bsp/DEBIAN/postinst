@@ -1,0 +1,92 @@
+#!/bin/bash
+
+BOOTSTACK="opt/switchroot"
+export DISPLAY=":0"
+export XAUTHORITY="/run/user/1000/gdm/Xauthority"
+
+if [[ ! -f /${BOOTSTACK}/image_prep ]]; then
+	SWR_DIR=$(sed -ne 's/.*swr_dir=//;T' -e 's/\s.*$//p' /proc/cmdline)
+	MMC_BLK=$(sed -ne 's/.*boot_m=//;T' -e 's/\s.*$//p' /proc/cmdline)
+	MMC_PART=$(sed -ne 's/.*boot_p=//;T' -e 's/\s.*$//p' /proc/cmdline)
+	DEV_MMC="mmcblk0"
+
+	if [[ ! -n ${SWR_DIR} ]]; then SWR_DIR="switchroot/ubuntu-jammy"; fi
+	if [[ ! -n ${MMC_BLK} ]]; then MMC_BLK=0; fi
+	if [[ ! -n ${MMC_PART} ]]; then MMC_PART=1; fi
+
+	if [[ -e /dev/mmcblk1 ]] && [[ ${MMC_BLK} -eq 1 ]]; then DEV_MMC="mmcblk1"; fi
+
+	mkdir -p /${BOOTSTACK}/boot_disk || true
+
+	set -e
+	echo "Mounting boot disk ${DEV_MMC}p${MMC_PART}" >&2
+	mount /dev/${DEV_MMC}p${MMC_PART} /${BOOTSTACK}/boot_disk || mountpoint -q /${BOOTSTACK}/boot_disk
+
+	echo "Copying boot files" >&2
+	rm -f /${BOOTSTACK}/boot_disk/${SWR_DIR}/modules.tar.gz || true
+	rm -f /${BOOTSTACK}/boot_disk/${SWR_DIR}/update.tar.gz || true
+	cp -r /${BOOTSTACK}/bootstack/. /${BOOTSTACK}/boot_disk/${SWR_DIR}/
+
+	# Copy new config if needed.
+	if ! grep -q l4t=1 /${BOOTSTACK}/boot_disk/bootloader/ini/L4T-jammy.ini; then
+		cp /${BOOTSTACK}/L4T-jammy.ini /${BOOTSTACK}/boot_disk/bootloader/ini/L4T-jammy.ini || true
+	fi
+
+	# Replace bootloader if old.
+	BL_VERSION_OLD=$(cat /${BOOTSTACK}/boot_disk/bootloader/update.bin | tail -c +285 | head -c +3)
+	BL_VERSION_NEW=$(cat /${BOOTSTACK}/bootloader.bin | tail -c +285 | head -c +3)
+	if [[ ${BL_VERSION_OLD} -lt ${BL_VERSION_NEW} ]]; then
+		echo "Old hekate found! Update to latest!" >&2
+		sudo -u root notify-send -t 5000 -u critical -i update-manager "Old hekate found!" "Update to latest!" || true
+		cp /${BOOTSTACK}/bootloader.bin /${BOOTSTACK}/boot_disk/bootloader/update.bin || true
+	fi
+
+	sync
+
+	echo "Unmounting boot disk" >&2
+	umount /${BOOTSTACK}/boot_disk || true
+else
+	rm -f /${BOOTSTACK}/image_prep || true
+fi
+
+set -e
+echo "Extracting kernel modules and firmware" >&2
+rm -r /lib/modules/* || true
+tar --keep-directory-symlink -zxpf /${BOOTSTACK}/modules.tar.gz -C /lib/
+
+# Remove NV Camera (CSI bus) service.
+rm -f /etc/systemd/system/multi-user.target.wants/nvargus-daemon.service || true
+# Remove NV Sensor service.
+rm -f /etc/systemd/system/multi-user.target.wants/nvs-service.service || true
+# Remove NV Zram service.
+rm -f /etc/systemd/system/multi-user.target.wants/nvzramconfig.service || true
+# Remove NV Getty service.
+rm -f /etc/systemd/system/multi-user.target.wants/nvgetty.service || true
+# Remove r2p set.
+rm -f /etc/rc.local || true
+
+# Disable apport for NV Power Hinting and NV Power Model.
+echo "/usr/sbin/nvphsd" > /etc/apport/blacklist.d/nvphs
+echo "/usr/sbin/nvpmodel" > /etc/apport/blacklist.d/nvpmodel
+
+# Correct machine-id if needed
+if [ "$(cat /etc/machine-id)" != "$(cat /var/lib/dbus/machine-id)" ] && [ ! -z "$(cat /etc/machine-id)" ] ; then
+	rm -f /var/lib/dbus/machine-id
+	ln -s /etc/machine-id /var/lib/dbus/machine-id
+fi
+
+SWR_VER=$(cat /etc/switchroot_version.conf)
+
+echo "L4T Ubuntu updated to ${SWR_VER}!" >&2
+echo "A REBOOT is required to replace Kernel, modules, firmware and configuration." >&2
+echo "Please reboot the system when convenient." >&2
+
+touch /var/run/reboot-required || true
+
+# same thing for the older update-notifier interface
+[ -x /usr/share/update-notifier/notify-reboot-required ] && \
+	/usr/share/update-notifier/notify-reboot-required || true
+
+sudo -u root notify-send -t 5000 -u critical -i update-manager "L4T Ubuntu updated to ${SWR_VER}!" "A reboot is required to finish installation..." || true
+
+exit 0

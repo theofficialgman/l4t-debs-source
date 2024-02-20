@@ -1,0 +1,18 @@
+Package: switch-l4t-configs
+Version: 1.5-8
+Architecture: all
+Priority: required
+Section: embedded
+Depends: yad, libhidapi-hidraw0, imagemagick
+Maintainer: CTCaer <ctcaer@gmail.com>
+Changed-By: theofficialgman <dofficialgman@gmail.com>
+Standards-Version: 4.1.2
+Description: L4T Configs for Nintendo Switch
+ Special L4T support for Nintendo Switch.
+ Adds the following:
+ - nvidia-xconfig-l4t
+ - tegrastats-l4t
+ - Onboard Logout helper service
+ - BSP apt restrictions
+ - L4T Megascript App
+ - Switchroot wallpaper

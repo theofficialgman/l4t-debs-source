@@ -1,0 +1,9 @@
+#!/bin/bash
+
+divert() {
+    dpkg-divert --package switch-multimedia --remove --rename --divert "${1}.orig" "$1"
+}
+
+if [ remove = "$1" -o abort-install = "$1" -o disappear = "$1" ] || ( [ abort-upgrade = "$1" ] && dpkg --compare-versions "$2" lt 1.0-1 ); then
+    divert /usr/share/metainfo/smplayer.appdata.xml
+fi

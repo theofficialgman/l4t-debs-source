@@ -1,0 +1,10 @@
+38be0cb5093df3ad89d803122398b29e  usr/bin/jetson_clocks
+759d5fceac1a78c18e0c93272c7a9360  usr/bin/tegrastats
+56556d97725d8234fe287a3e1098747b  usr/sbin/l4t_payload_updater_t210
+258d40fb82d6a91cd67a8693b5487edd  usr/sbin/nvpmodel
+a2d427292c46e0734b36dbca2ac05ae5  usr/share/doc/nvidia-l4t-tools/changelog.Debian.gz
+fe65a18c0cbf70d19e3d6202a8c825b6  usr/share/doc/nvidia-l4t-tools/copyright
+e1f3998c200e104dd7c97c98ece64e55  usr/share/doc/nvidia-tegra/NVIDIA_Trademark_License_Addendum_SW.pdf.gz
+472b67ae08341d7aa252c447d692126a  usr/share/nvpmodel_indicator/nv_logo.svg
+5cdbe9395c8136ead4a83d7acc058f0e  usr/share/nvpmodel_indicator/nvpmodel.py
+4b11af8a0e20c8c9012ee869dc740914  usr/share/nvpmodel_indicator/nvpmodel_indicator.py

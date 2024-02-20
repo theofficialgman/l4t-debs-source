@@ -1,0 +1,184 @@
+From 57292f574156f817b7cbeb33ea6278c6eab22bcc Mon Sep 17 00:00:00 2001
+From: "H.J. Lu" <hjl.tools@gmail.com>
+Date: Fri, 19 Nov 2021 06:18:56 -0800
+Subject: [PATCH] Add GLIBC_ABI_DT_RELR for DT_RELR support
+
+The EI_ABIVERSION field of the ELF header in executables and shared
+libraries can be bumped to indicate the minimum ABI requirement on the
+dynamic linker.  However, EI_ABIVERSION in executables isn't checked by
+the Linux kernel ELF loader nor the existing dynamic linker.  Executables
+will crash mysteriously if the dynamic linker doesn't support the ABI
+features required by the EI_ABIVERSION field.  The dynamic linker should
+be changed to check EI_ABIVERSION in executables.
+
+Add a glibc version, GLIBC_ABI_DT_RELR, to indicate DT_RELR support so
+that the existing dynamic linkers will issue an error on executables with
+GLIBC_ABI_DT_RELR dependency.  When there is a DT_VERNEED entry with
+libc.so on DT_NEEDED, issue an error if there is a DT_RELR entry without
+GLIBC_ABI_DT_RELR dependency.
+
+Support __placeholder_only_for_empty_version_map as the placeholder symbol
+used only for empty version map to generate GLIBC_ABI_DT_RELR without any
+symbols.
+---
+ elf/Makefile         | 14 ++++++++++++--
+ elf/Versions         |  5 +++++
+ elf/dl-version.c     | 35 +++++++++++++++++++++++++++++++++--
+ include/link.h       |  2 ++
+ scripts/abilist.awk  |  2 ++
+ scripts/versions.awk |  7 ++++++-
+ 6 files changed, 60 insertions(+), 5 deletions(-)
+
+diff --git a/elf/Makefile b/elf/Makefile
+index 3d55f43..4a1f2c7 100644
+--- a/elf/Makefile
++++ b/elf/Makefile
+@@ -1113,8 +1113,12 @@ $(eval $(call include_dsosort_tests,dso-sort-tests-1.def))
+ $(eval $(call include_dsosort_tests,dso-sort-tests-2.def))
+ endif
+ 
+-check-abi: $(objpfx)check-abi-ld.out
+-tests-special += $(objpfx)check-abi-ld.out
++check-abi: $(objpfx)check-abi-ld.out \
++	   $(objpfx)check-abi-version-libc.out
++tests-special += \
++  $(objpfx)check-abi-ld.out \
++  $(objpfx)check-abi-version-libc.out \
++# tests-special
+ update-abi: update-abi-ld
+ update-all-abi: update-all-abi-ld
+ 
+@@ -2752,6 +2756,12 @@ $(objpfx)tst-p_align3.out: tst-p_align3.sh $(objpfx)tst-p_align3
+ 	$(SHELL) $< $(common-objpfx) '$(test-program-prefix)'; \
+ 	$(evaluate-test)
+ 
++$(objpfx)check-abi-version-libc.out: $(common-objpfx)libc.so
++	LC_ALL=C $(READELF) -V -W $< \
++		| sed -ne '/.gnu.version_d/, /.gnu.version_r/ p' \
++		| grep GLIBC_ABI_DT_RELR > $@; \
++	$(evaluate-test)
++
+ LDFLAGS-libtracemod1-1.so += -Wl,-soname,libtracemod1.so
+ LDFLAGS-libtracemod2-1.so += -Wl,-soname,libtracemod2.so
+ LDFLAGS-libtracemod3-1.so += -Wl,-soname,libtracemod3.so
+diff --git a/elf/Versions b/elf/Versions
+index 8bed855d8cb..a9ff278de78 100644
+--- a/elf/Versions
++++ b/elf/Versions
+@@ -23,6 +23,11 @@ libc {
+   GLIBC_2.35 {
+     _dl_find_object;
+   }
++  GLIBC_ABI_DT_RELR {
++    # This symbol is used only for empty version map and will be removed
++    # by scripts/versions.awk.
++    __placeholder_only_for_empty_version_map;
++  }
+   GLIBC_PRIVATE {
+     # functions used in other libraries
+     __libc_early_init;
+diff --git a/elf/dl-version.c b/elf/dl-version.c
+index b47bd917273..cda08892098 100644
+--- a/elf/dl-version.c
++++ b/elf/dl-version.c
+@@ -214,12 +214,19 @@ _dl_check_map_versions (struct link_map *map, int verbose, int trace_mode)
+ 	      while (1)
+ 		{
+ 		  /* Match the symbol.  */
++		  const char *string = strtab + aux->vna_name;
+ 		  result |= match_symbol (DSO_FILENAME (map->l_name),
+ 					  map->l_ns, aux->vna_hash,
+-					  strtab + aux->vna_name,
+-					  needed->l_real, verbose,
++					  string, needed->l_real, verbose,
+ 					  aux->vna_flags & VER_FLG_WEAK);
+ 
++		  /* 0xfd0e42: _dl_elf_hash ("GLIBC_ABI_DT_RELR").  */
++		  if (aux->vna_hash == 0xfd0e42
++		      && __glibc_likely (strcmp (string,
++						 "GLIBC_ABI_DT_RELR")
++					 == 0))
++		    map->l_dt_relr_ref = 1;
++
+ 		  /* Compare the version index.  */
+ 		  if ((unsigned int) (aux->vna_other & 0x7fff) > ndx_high)
+ 		    ndx_high = aux->vna_other & 0x7fff;
+@@ -352,6 +359,30 @@ _dl_check_map_versions (struct link_map *map, int verbose, int trace_mode)
+ 	}
+     }
+ 
++  /* When there is a DT_VERNEED entry with libc.so on DT_NEEDED, issue
++     an error if there is a DT_RELR entry without GLIBC_ABI_DT_RELR
++     dependency.  */
++  if (dyn != NULL
++      && map->l_info[DT_NEEDED] != NULL
++      && map->l_info[DT_RELR] != NULL
++      && __glibc_unlikely (!map->l_dt_relr_ref))
++    {
++      const char *strtab = (const void *) D_PTR (map, l_info[DT_STRTAB]);
++      const ElfW(Dyn) *d;
++      for (d = map->l_ld; d->d_tag != DT_NULL; ++d)
++	if (d->d_tag == DT_NEEDED)
++	  {
++	    const char *name = strtab + d->d_un.d_val;
++	    if (strncmp (name, "libc.so.", 8) == 0)
++	      {
++		_dl_exception_create
++		  (&exception, DSO_FILENAME (map->l_name),
++		   N_("DT_RELR without GLIBC_ABI_DT_RELR dependency"));
++		goto call_error;
++	      }
++	  }
++    }
++
+   return result;
+ }
+ 
+diff --git a/include/link.h b/include/link.h
+index 03db14c7b0f..0ac82d7c774 100644
+--- a/include/link.h
++++ b/include/link.h
+@@ -177,6 +177,8 @@ struct link_map
+ 	lt_library,		/* Library needed by main executable.  */
+ 	lt_loaded		/* Extra run-time loaded shared object.  */
+       } l_type:2;
++    unsigned int l_dt_relr_ref:1; /* Nonzero if GLIBC_ABI_DT_RELR is
++				     referenced.  */
+     unsigned int l_relocated:1;	/* Nonzero if object's relocations done.  */
+     unsigned int l_init_called:1; /* Nonzero if DT_INIT function called.  */
+     unsigned int l_global:1;	/* Nonzero if object in _dl_global_scope.  */
+diff --git a/scripts/abilist.awk b/scripts/abilist.awk
+index 24a34ccbed2..6cc7af6ac8e 100644
+--- a/scripts/abilist.awk
++++ b/scripts/abilist.awk
+@@ -55,6 +55,8 @@ $2 == "g" || $2 == "w" && (NF == 7 || NF == 8) {
+   # caused STV_HIDDEN symbols to appear in .dynsym, though that is useless.
+   if (NF > 7 && $7 == ".hidden") next;
+ 
++  if (version ~ /^GLIBC_ABI_/ && !include_abi_version) next;
++
+   if (version == "GLIBC_PRIVATE" && !include_private) next;
+ 
+   desc = "";
+diff --git a/scripts/versions.awk b/scripts/versions.awk
+index 357ad1355e4..d70b07bd1a7 100644
+--- a/scripts/versions.awk
++++ b/scripts/versions.awk
+@@ -185,8 +185,13 @@ END {
+ 	closeversion(oldver, veryoldver);
+ 	veryoldver = oldver;
+       }
+-      printf("%s {\n  global:\n", $2) > outfile;
+       oldver = $2;
++      # Skip the placeholder symbol used only for empty version map.
++      if ($3 == "__placeholder_only_for_empty_version_map;") {
++	printf("%s {\n", $2) > outfile;
++	continue;
++      }
++      printf("%s {\n  global:\n", $2) > outfile;
+     }
+     printf("   ") > outfile;
+     for (n = 3; n <= NF; ++n) {
+-- 
+GitLab
+

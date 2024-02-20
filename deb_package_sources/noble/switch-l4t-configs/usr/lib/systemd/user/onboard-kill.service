@@ -1,0 +1,9 @@
+[Unit]
+Description=Onboard kill
+PartOf=graphical-session.target
+After=indicators-pre.target
+StopWhenUnneeded=yes
+
+[Service]
+RemainAfterExit=yes
+ExecStop=/usr/bin/killall -9 onboard

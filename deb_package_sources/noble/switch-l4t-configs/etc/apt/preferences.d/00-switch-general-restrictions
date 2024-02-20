@@ -1,0 +1,16 @@
+# Disallow packages generally available from the distro that are known broken or cause issues
+Package: nvidia-settings
+Pin: release o=Ubuntu*
+Pin-Priority: 500
+
+Package: nvidia-*
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: libnvidia-*
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: libwine-development
+Pin: release o=Ubuntu*
+Pin-Priority: -1

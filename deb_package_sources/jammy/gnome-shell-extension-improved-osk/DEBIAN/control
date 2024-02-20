@@ -1,0 +1,9 @@
+Package: gnome-shell-extension-improved-osk
+Version: 42-2
+Architecture: all
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Depends: gnome-shell (>= 42), gnome-shell (<< 43~), dconf-gsettings-backend | gsettings-backend
+Section: gnome
+Priority: optional
+Homepage: https://github.com/theofficialgman/improved-osk-gnome-ext/tree/gnome_42
+Description: improved onscreen keyboard for gnome

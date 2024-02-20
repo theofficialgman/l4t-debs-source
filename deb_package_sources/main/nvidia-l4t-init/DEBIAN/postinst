@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Only create default configurations during BSP package pre-installation.
+# Otherwise when upgrading this package on a system which has older version
+# installed, the default configurations will overwrite the files which are
+# likely customized by user.
+if [ ! -e "/opt/nvidia/l4t-packages/.nv-l4t-disable-boot-fw-update-in-preinstall" ]; then
+	exit 0
+fi
+
+cat << EOF > /etc/fstab
+# Copyright (c) 2019, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+# /etc/fstab: static file system information.
+#
+# These are the filesystems that are always mounted on boot, you can
+# override any of these by copying the appropriate line from this file into
+# /etc/fstab and tweaking it as you see fit.  See fstab(5).
+#
+# <file system> <mount point>             <type>          <options>                               <dump> <pass>
+/dev/root            /                     ext4           defaults                                     0 1
+EOF
+
+cat << EOF > /etc/hosts
+127.0.0.1 localhost
+EOF
+
+cat << EOF > /etc/hostname
+EOF
+
+cat <<EOF >> /etc/modules
+# bluedroid_pm, supporting module for bluetooth
+bluedroid_pm
+# modules for camera HAL
+nvhost_vi
+# nvgpu module
+nvgpu
+EOF
+
+cat <<EOF >> /etc/default/locale
+LANG=en_US.UTF-8
+EOF

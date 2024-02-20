@@ -1,0 +1,10 @@
+Package: switch-dock-handler
+Version: 2.1-3
+Architecture: all
+Maintainer: CTCaer <ctcaer@gmail.com>
+Changed-By: theofficialgman <dofficialgman@gmail.com>
+Depends: x11-xserver-utils, pulseaudio-utils, v4l-utils
+Section: embedded
+Priority: required
+Homepage: https://gitlab.com/switchroot
+Description: Scripts to switch display and audio source when docked

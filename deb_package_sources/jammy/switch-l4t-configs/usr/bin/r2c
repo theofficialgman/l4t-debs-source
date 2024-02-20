@@ -1,0 +1,245 @@
+#!/bin/bash
+
+error() { #red text and exit 1
+	echo -e "\e[91m$1\e[0m" 1>&2
+	yad --class Reboot-To-Config --name "Reboot 2 Config" \
+		--no-escape --fixed --show-uri --center --image "dialog-error" --borders="20" --title "ERROR" \
+		--text="$1" --wrap \
+		--window-icon="/usr/share/nvpmodel_indicator/nv_logo.svg" \
+		--button="Exit":0
+	exit 1
+}
+
+version_parse() {
+	echo "$@" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3); }'
+}
+
+status() { #cyan text to indicate what is happening
+	echo -e "\e[96m$1\e[0m"
+}
+
+status_green() { #announce the success of a major action
+	echo -e "\e[92m$1\e[0m"
+}
+
+cleanup() {
+	[ -z "$BOOTSTACK" ] && error "cleanup(): BOOTSTACK variable not set"
+	[ -z "$temp_folder" ] && error "cleanup(): temp_folder variable not set"
+	status "Unmounting boot disk" >&2
+	umount /${BOOTSTACK}/boot_disk || true
+	rm -rf $temp_folder
+}
+
+r2c() {
+	cleanup
+	echo $1 > /sys/devices/r2p/action
+	echo $2 > /sys/devices/r2p/param1
+	echo $3 > /sys/devices/r2p/param2
+	reboot
+}
+
+gui() {
+	unset INDEX
+	unset retrun_code
+	[ -z "$uniq_selection" ] && error "gui(): uniq_selection array not set"
+	[ -z "$button1" ] && button1="Back"
+	[ -z "$button2" ] && button2="Reboot"
+	INDEX=$(
+		yad --class Reboot-To-Config --name "Reboot 2 Config" \
+			--sticky --on-top --fixed \
+			--center \
+			--width="600" \
+			--height="450" \
+			--title "Reboot 2 Config" \
+			--text "Choose an entry to reboot to:" \
+			--borders="20" \
+			--window-icon="/usr/share/nvpmodel_indicator/nv_logo.svg" \
+			--list \
+			--separator='' \
+			--column=:IMG \
+			--column "Config Entry" \
+			--column "hekate Index" \
+			--column=@font@ \
+			--hide-column=3 \
+			--print-column=3 \
+			"${uniq_selection[@]}" \
+			--button="$button1":1 \
+			--button="$button2":0
+	)
+	return_code="$?"
+	unset button1
+	unset button2
+}
+
+section_parser() {
+	[ -z "$ini_file" ] && error "section_parser(): ini_file variable not set"
+	[ -z "$BOOTSTACK" ] && error "section_parser(): BOOTSTACK variable not set"
+	[ -z "$temp_folder" ] && error "section_parser(): temp_folder variable not set"
+	readarray -t sections < <(cat "$ini_file" | sed 's/\r$//' | grep '^\[.*\]')
+	# Loop through sections in .ini
+	for section in "${sections[@]}"; do
+		echo "$section"
+		# Skip [config] or index 0.
+		if [[ "$INDEX" == "0" ]] && [[ "$section" == '[config]' ]]; then
+			continue
+		fi
+		section_name="${section//[}"
+		section_name="${section_name//]}"
+		ids+=("$section_name")
+		section="${section//[/\\[}"
+		section="${section//]/\\]}"
+		icon_path="$(cat "$ini_file" | sed 's/\r$//' | sed -n "/^$section/,/^\[.*\]/"'{ /^\[.*\]/!p }' |	sed -n 's/^icon=//p' )"
+		ids_icon+=($icon_path)
+		mkdir -p "$(dirname "$icon_path")"
+		# Only generate png if bmp file is found and png is not already generated
+		if [ -f "/${BOOTSTACK}/boot_disk/$icon_path" ] && [ ! -f "$temp_folder/${icon_path//.bmp/.png}" ]; then
+			convert "/${BOOTSTACK}/boot_disk/$icon_path" -resize 48 -quality 10 "$temp_folder/${icon_path//.bmp/.png}"
+		fi
+	done
+}
+
+SWR_VER=$(cat /etc/switchroot_version.conf)
+if [ $(version_parse $SWR_VER) -lt $(version_parse "5.0.0") ]; then
+	error "L4T 5.0.0+ with hekate 6.0.0+ is required to use this script. Exiting without execution..."
+fi
+
+if [[ $(id -u) != 0 ]]; then
+	error "This script is designed to be run as root/sudo."
+fi
+
+BOOTSTACK="opt/switchroot"
+
+SWR_DIR=$(sed -ne 's/.*swr_dir=//;T' -e 's/\s.*$//p' /proc/cmdline)
+MMC_BLK=$(sed -ne 's/.*boot_m=//;T' -e 's/\s.*$//p' /proc/cmdline)
+MMC_PART=$(sed -ne 's/.*boot_p=//;T' -e 's/\s.*$//p' /proc/cmdline)
+DEV_MMC="mmcblk0"
+
+FONT_SIZE="22"
+
+if [[ ! -n ${SWR_DIR} ]]; then SWR_DIR="switchroot/ubuntu"; fi
+if [[ ! -n ${MMC_BLK} ]]; then MMC_BLK=0; fi
+if [[ ! -n ${MMC_PART} ]]; then MMC_PART=1; fi
+
+if [[ -e /dev/mmcblk1 ]] && [[ ${MMC_BLK} -eq 1 ]]; then DEV_MMC="mmcblk1"; fi
+
+mkdir -p /${BOOTSTACK}/boot_disk || true
+
+#set -e
+echo "Mounting boot disk ${DEV_MMC}p${MMC_PART}" >&2
+mount /dev/${DEV_MMC}p${MMC_PART} /${BOOTSTACK}/boot_disk || mountpoint -q /${BOOTSTACK}/boot_disk
+
+# make temporary folder for storing all bmp -> png converted files
+temp_folder=$(mktemp -d)
+cd $temp_folder
+
+# create default icons
+for icon_path in bootloader/res/icon_payload.bmp bootloader/res/icon_switch.bmp ; do
+	mkdir -p "$(dirname "$icon_path")"
+	if [ -f "/${BOOTSTACK}/boot_disk/$icon_path" ]; then
+		convert "/${BOOTSTACK}/boot_disk/$icon_path" -resize 48 -quality 10 "$temp_folder/${icon_path//.bmp/.png}"
+	fi
+done
+
+while true; do
+
+	# show YAD GUI for selecting category
+
+	uniq_selection=()
+	uniq_selection+=("$temp_folder/bootloader/res/icon_switch.png" "Launch" "0" "$FONT_SIZE")
+	uniq_selection+=("$temp_folder/bootloader/res/icon_switch.png" "More Configs" "1" "$FONT_SIZE")
+	uniq_selection+=(drive-removable-media "UMS" "2" "$FONT_SIZE")
+	uniq_selection+=(applications-utilities "hekate menu" "3" "$FONT_SIZE")
+	uniq_selection+=(system-reboot "Normal Reboot" "4" "$FONT_SIZE")
+	button1="Exit"
+	button2="Select"
+	gui
+
+	if [ "$INDEX" == "2" ]; then
+		# UMS
+		status_green "UMS Section"
+		uniq_selection=()
+		uniq_selection+=(media-flash "SD Card" "0" "$FONT_SIZE")
+		uniq_selection+=(drive-harddisk "eMMC BOOT0" "1" "$FONT_SIZE")
+		uniq_selection+=(drive-harddisk "eMMC BOOT1" "2" "$FONT_SIZE")
+		uniq_selection+=(drive-harddisk "eMMC GPP" "3" "$FONT_SIZE")
+		uniq_selection+=(media-flash "emuMMC BOOT0" "4" "$FONT_SIZE")
+		uniq_selection+=(media-flash "emuMMC BOOT1" "5" "$FONT_SIZE")
+		uniq_selection+=(media-flash "emuMMC GPP" "6" "$FONT_SIZE")
+		gui
+		if [ ! -z "$INDEX" ]; then
+			r2c "ums" $INDEX 0
+			break
+		fi
+	elif [ "$INDEX" == "3" ]; then
+		# hekate menu
+		r2c "bootloader" 0 0
+		break
+	elif [ "$INDEX" == "4" ]; then
+		# Normal Reboot
+		r2c "normal" 0 0
+		break
+	elif [ "$INDEX" == "0" ]; then
+		# Launch section
+		status_green "Launch Section"
+		ini_file="/${BOOTSTACK}/boot_disk/bootloader/hekate_ipl.ini"
+
+		ids=()
+		ids_icon=()
+
+		section_parser
+
+		uniq_selection=()
+		END="${#ids[@]}"
+		for ((i=0;i<END;i++)); do
+			if [ -f "$temp_folder/${ids_icon[i]//.bmp/.png}" ]; then
+				uniq_selection+=("$temp_folder/${ids_icon[i]//.bmp/.png}" "${ids[i]}" "$((i+1))" "$FONT_SIZE")
+			else
+				uniq_selection+=("$temp_folder/bootloader/res/icon_payload.png" "${ids[i]}" "$((i+1))" "$FONT_SIZE")
+			fi
+		done
+
+		gui
+
+		if [ ! -z "$INDEX" ]; then
+			r2c "self" $INDEX 0
+			break
+		fi
+
+	elif [ "$INDEX" == "1" ]; then
+		# More configs section (list ini files by ascii ordering)
+		status_green "More Configs Section"
+		IFS=$'\n' ini_files=($( LC_ALL=C ls /${BOOTSTACK}/boot_disk/bootloader/ini/*.ini))
+
+		ids=()
+		ids_icon=()
+		# Loop through .ini files
+		for ini_file in "${ini_files[@]}"; do
+			section_parser
+		done
+
+		# Show YAD GUI for selecting Reboot command
+		uniq_selection=()
+		END="${#ids[@]}"
+		for ((i=0;i<END;i++)); do
+			if [ -f "$temp_folder/${ids_icon[i]//.bmp/.png}" ]; then
+				uniq_selection+=("$temp_folder/${ids_icon[i]//.bmp/.png}" "${ids[i]}" "$((i+1))" "$FONT_SIZE")
+			else
+				uniq_selection+=("$temp_folder/bootloader/res/icon_payload.png" "${ids[i]}" "$((i+1))" "$FONT_SIZE")
+			fi
+		done
+
+		gui
+
+		if [ ! -z "$INDEX" ]; then
+			r2c "self" $INDEX 1
+			break
+		fi
+	else
+		break
+	fi
+
+done
+
+cleanup
+
+exit 0

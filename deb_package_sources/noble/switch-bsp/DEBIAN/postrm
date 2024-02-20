@@ -1,0 +1,31 @@
+#!/bin/bash
+
+divert() {
+    dpkg-divert --package switch-bsp --remove --rename --divert "${1}.orig" "$1"
+}
+
+if [ remove = "$1" -o abort-install = "$1" -o disappear = "$1" ] || ( [ abort-upgrade = "$1" ] && dpkg --compare-versions "$2" lt 5.1.2-12 ); then
+    divert /etc/nv_boot_control.conf
+    divert /etc/xdg/autostart/nvbackground.desktop
+    divert /etc/xdg/autostart/nvbackground.sh
+    divert /etc/xdg/autostart/nvchrome.desktop
+    divert /etc/xdg/autostart/nvchrome.sh
+    divert /etc/xdg/autostart/nvlxde-compton.desktop
+    divert /etc/xdg/autostart/nvlxde-exempt.desktop
+    divert /etc/xdg/autostart/nvlxde-exempt.sh
+    divert /etc/xdg/autostart/nvpmodel_indicator.desktop
+    divert /etc/systemd/nv.sh
+    divert /etc/udev/rules.d/99-nv-ufs-mount.rules
+    divert /etc/udev/rules.d/99-tegra-mmc-ra.rules
+    divert /etc/update-manager/release-upgrades
+    divert /etc/X11/xorg.conf
+    divert /etc/X11/xorg.conf.jetson_e
+    divert /lib/systemd/system/bluetooth.service.d/nv-bluetooth-service.conf
+    divert /opt/nvidia/l4t-bootloader-config/nv-l4t-bootloader-config.service
+    divert /opt/nvidia/l4t-bootloader-config/nv-l4t-bootloader-config.sh
+    divert /opt/nvidia/l4t-usb-device-mode/nv-l4t-usb-device-mode-runtime-start.sh
+    divert /opt/nvidia/l4t-usb-device-mode/nv-l4t-usb-device-mode-start.sh
+    divert /usr/share/backgrounds/NVIDIA_Login_Logo.png
+    divert /usr/share/backgrounds/NVIDIA_Logo.png
+    divert /usr/share/unity-control-center/ui/UbuntuLogo.png
+fi

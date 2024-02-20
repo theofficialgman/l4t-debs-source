@@ -1,0 +1,18 @@
+#!/bin/sh
+
+BTCTL=/etc/init.d/bluetooth
+
+case $1/$2 in
+	pre/*)
+		echo "Disabling bluetooth..."
+		$BTCTL stop
+		modprobe -r hci_uart
+		;;
+	post/*)
+		echo "Enabling bluetooth..."
+		modprobe hci_uart
+		$BTCTL start
+		;;
+esac
+
+exit 0
