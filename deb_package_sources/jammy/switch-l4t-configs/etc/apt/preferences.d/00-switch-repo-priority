@@ -1,0 +1,5 @@
+# this file is required on ESM enabled systems due to Ubuntu ESM using pin priority of 510
+
+Package: *
+Pin: release o=theofficialgman-L4T
+Pin-Priority: 511

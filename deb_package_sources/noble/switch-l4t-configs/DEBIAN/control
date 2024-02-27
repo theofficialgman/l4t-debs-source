@@ -1,5 +1,5 @@
 Package: switch-l4t-configs
-Version: 1.5-8+24.04
+Version: 1.5-9+24.04
 Architecture: all
 Priority: required
 Section: embedded
