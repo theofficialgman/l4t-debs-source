@@ -14,3 +14,9 @@ Pin-Priority: -1
 Package: libwine-development
 Pin: release o=Ubuntu*
 Pin-Priority: -1
+
+# Disallow all packages from Proprietary GPU Drivers PPA
+# Switch uses a Tegra X1 and is NOT compatible with desktop Nvidia GPU drivers
+Package: *
+Pin: release o=LP-PPA-graphics-drivers
+Pin-Priority: -1
