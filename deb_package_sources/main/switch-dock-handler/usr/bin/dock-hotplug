@@ -53,6 +53,8 @@ dock_hotplug_handle() {
       sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 1 off
       sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 0 output:hdmi-stereo
     else
+      # force tegrahda jack update
+      cat /proc/asound/tegrahda/codec* &>/dev/null
       sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl set-default $(sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl status | grep "Built-in Audio Digital Stereo (HDMI)" | grep "\d+" -Po | head -n 1)
     fi
     [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
