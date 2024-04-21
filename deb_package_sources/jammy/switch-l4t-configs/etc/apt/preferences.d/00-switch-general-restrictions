@@ -20,3 +20,20 @@ Pin-Priority: -1
 Package: *
 Pin: release o=LP-PPA-graphics-drivers
 Pin-Priority: -1
+
+# Disallow all snap dummy apt packages
+Package: firefox*
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: chromium-browser*
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: chromium-codecs*
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: chromium-chromedriver
+Pin: release o=Ubuntu*
+Pin-Priority: -1
