@@ -14,3 +14,10 @@ binding='Launch9'
 command='toggle-osk'
 name='toggle-osk'
 
+[com/canonical/unity/settings-daemon/plugins/media-keys]
+custom-keybindings=['/com/canonical/unity/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']
+
+[com/canonical/unity/settings-daemon/plugins/media-keys/custom-keybindings/custom0]
+binding='Launch9'
+command='toggle-osk'
+name='toggle-osk'

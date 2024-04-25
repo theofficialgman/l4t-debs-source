@@ -1,5 +1,13 @@
 #!/bin/bash
-status=$(gsettings get org.gnome.shell.extensions.improvedosk toggle)
-if [[ ${status} == "true" ]]; then toggle="false"
-else toggle="true"; fi
-gsettings set org.gnome.shell.extensions.improvedosk toggle ${toggle}
+
+if gsettings list-schemas | grep -q org.gnome.shell.extensions.improvedosk ; then
+  status=$(gsettings get org.gnome.shell.extensions.improvedosk toggle)
+  if [[ ${status} == "true" ]]; then
+    toggle="false"
+  else
+    toggle="true"
+  fi
+  gsettings set org.gnome.shell.extensions.improvedosk toggle ${toggle}
+elif gsettings list-schemas | grep -q org.onboard ; then
+  dbus-send --type=method_call --dest=org.onboard.Onboard /org/onboard/Onboard/Keyboard org.onboard.Onboard.Keyboard.ToggleVisible
+fi
