@@ -1,0 +1,36 @@
+# Disallow Ubuntu plymouth packages due to upstream bug in newer version https://gitlab.freedesktop.org/plymouth/plymouth/-/issues/254
+Package: libplymouth-dev
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: libplymouth5
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: plymouth-label-ft
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: plymouth-label
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: plymouth-theme-spinner
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: plymouth-themes-ubuntu-text
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: plymouth-themes
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: plymouth-x11
+Pin: release o=Ubuntu*
+Pin-Priority: -1
+
+Package: plymouth
+Pin: release o=Ubuntu*
+Pin-Priority: -1
