@@ -49,6 +49,12 @@ dock_hotplug_handle() {
   if [[ "$1" -eq 1 ]]; then
     # DP output.
     gsettings set org.gnome.settings-daemon.plugins.xsettings rgba-order rgb
+    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":0" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+    # Reapply config to avoid X stubbornness.
+    sleep 0.2
+    [ "$DE" != KDE ] && DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+    [ "$DE" != KDE ] && DISPLAY=":0" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
     if [[ -x $(command -v pactl) ]] && ! pactl --server "$DH_PULSE_SERVER" info | grep -q "^Server Name:.*PipeWire"; then
       sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 1 off
       sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 0 output:hdmi-stereo
@@ -57,28 +63,22 @@ dock_hotplug_handle() {
       cat /proc/asound/tegrahda/codec* &>/dev/null
       sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl set-default $(sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl status | grep "Built-in Audio Digital Stereo (HDMI)" | grep "\d+" -Po | head -n 1)
     fi
-    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
-    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":0" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
-    # Reapply config to avoid X stubbornness.
-    sleep 0.2
-    [ "$DE" != KDE ] && DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
-    [ "$DE" != KDE ] && DISPLAY=":0" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
   else
     # DSI output.
     gsettings set org.gnome.settings-daemon.plugins.xsettings rgba-order vbgr
     sudo -u "$DH_USER_NAME" xinput enable "touchscreen"
-    if [[ -x $(command -v pactl) ]] && ! pactl --server "$DH_PULSE_SERVER" info | grep -q "^Server Name:.*PipeWire"; then
-      sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 1 HiFi
-      sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 0 off
-    else
-      sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl set-default $(sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl status | grep "Built-in Audio Speaker playback + Headphones playback" | grep "\d+" -Po | head -n 1)
-    fi
     [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":1" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
     [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":0" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
     # Reapply config to avoid X stubbornness.
     sleep 0.2
     [ "$DE" != KDE ] && DISPLAY=":1" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
     [ "$DE" != KDE ] && DISPLAY=":0" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
+    if [[ -x $(command -v pactl) ]] && ! pactl --server "$DH_PULSE_SERVER" info | grep -q "^Server Name:.*PipeWire"; then
+      sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 1 HiFi
+      sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 0 off
+    else
+      sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl set-default $(sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl status | grep "Built-in Audio Speaker playback + Headphones playback" | grep "\d+" -Po | head -n 1)
+    fi
   fi
 
   # On dock touch is still rotated, so we rotate it the same amount.
