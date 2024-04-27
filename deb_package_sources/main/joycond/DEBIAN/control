@@ -1,0 +1,8 @@
+Package: joycond
+Architecture: arm64
+Maintainer: Daniel J. Ogorchock, CTCaer
+Changed-By: theofficialgman <dofficialgman@gmail.com>
+Priority: important
+Version: 0.6-1
+Description: Pairs joy-cons together into a virtual controller
+Depends: libevdev2, libudev1
