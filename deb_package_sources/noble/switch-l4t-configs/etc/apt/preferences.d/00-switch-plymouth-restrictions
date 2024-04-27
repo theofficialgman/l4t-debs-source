@@ -19,7 +19,7 @@ Package: plymouth-theme-spinner
 Pin: release o=Ubuntu*
 Pin-Priority: -1
 
-Package: plymouth-themes-ubuntu-text
+Package: plymouth-theme-ubuntu-text
 Pin: release o=Ubuntu*
 Pin-Priority: -1
 
