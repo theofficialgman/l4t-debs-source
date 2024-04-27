@@ -1,5 +1,5 @@
 Package: switch-kde
-Version: 1.0-6
+Version: 1.0-7
 Architecture: arm64
 Maintainer: theofficialgman <dofficialgman@gmail.com>
 Depends: plasma-desktop, plasma-discover-backend-flatpak, switch-sddm-rule
