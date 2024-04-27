@@ -1,5 +1,5 @@
 Package: switch-dconf-customizations
-Version: 1.0-3
+Version: 1.0-4
 Architecture: all
 Maintainer: theofficialgman <dofficialgman@gmail.com>
 Depends: dconf-cli
