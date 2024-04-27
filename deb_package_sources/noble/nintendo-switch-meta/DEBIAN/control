@@ -1,8 +1,8 @@
 Package: nintendo-switch-meta
-Version: 1.0-8+24.04~2
+Version: 1.0-9+24.04
 Architecture: arm64
 Maintainer: theofficialgman <dofficialgman@gmail.com>
-Depends: switch-dock-handler, switch-alsa-ucm2, switch-touch-rules, switch-l4t-configs, switch-dconf-customizations, switch-joystick-mouse, switch-bsp, switch-flatpak | switch-flatpak-32-7, switch-multimedia, switch-l4t-repo
+Depends: switch-dock-handler, switch-alsa-ucm2, switch-touch-rules, switch-l4t-configs, switch-dconf-customizations, joycond, switch-joystick-mouse, switch-bsp, switch-flatpak | switch-flatpak-32-7, switch-multimedia, switch-l4t-repo
 Recommends: switch-gnome | switch-kde | switch-unity
 Section: embedded
 Priority: required
