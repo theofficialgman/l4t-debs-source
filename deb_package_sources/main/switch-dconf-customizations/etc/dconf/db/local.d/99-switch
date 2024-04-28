@@ -21,3 +21,14 @@ custom-keybindings=['/com/canonical/unity/settings-daemon/plugins/media-keys/cus
 binding='Launch9'
 command='toggle-osk'
 name='toggle-osk'
+
+[org/onboard/auto-show]
+enabled=true
+
+[org/onboard]
+xembed-onboard=true
+theme='/usr/share/onboard/themes/Nightshade.theme'
+
+[org/onboard/window]
+docking-edge='bottom'
+docking-enabled=true
