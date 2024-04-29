@@ -3,3 +3,6 @@ screen-keyboard-enabled=true
 
 [com/canonical/unity-greeter]
 onscreen-keyboard=true
+
+[org/gnome/desktop/interface]
+toolkit-accessibility=true

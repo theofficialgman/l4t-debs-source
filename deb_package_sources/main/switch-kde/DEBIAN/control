@@ -1,8 +1,8 @@
 Package: switch-kde
-Version: 1.0-8
+Version: 1.0-9
 Architecture: arm64
 Maintainer: theofficialgman <dofficialgman@gmail.com>
-Depends: plasma-desktop, plasma-discover-backend-flatpak, switch-sddm-rule
+Depends: plasma-desktop, sddm, switch-sddm-rule, onboard, plasma-discover-backend-flatpak, fuse3, libfuse2
 Conflicts: plasma-discover-backend-snap, plasma-discover-backend-fwupd
 Section: embedded
 Priority: required
