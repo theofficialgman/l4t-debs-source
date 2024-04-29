@@ -24,9 +24,6 @@ dock_hotplug_handle() {
   export DSI_SETTINGS="--primary --mode 720x1280 --rotate left --panning 1280x720+0+0 --pos 0x0 --dpi 120 --fb 1280x720"
   export XAUTHORITY=$(ps -C Xorg -f --no-header | sed -n 's/.*-auth //; s/ -[^ ].*//; p')
 
-  # check if is KDE
-  [ -e /var/run/user/1000/kdeinit5__0 ] && DE=KDE
-
   # Set DP output vars.
   if [[ "$1" -eq 1 ]]; then
     # Read custom WIDTHxHEIGHT from dock-hotplug.conf.
@@ -49,12 +46,12 @@ dock_hotplug_handle() {
   if [[ "$1" -eq 1 ]]; then
     # DP output.
     gsettings set org.gnome.settings-daemon.plugins.xsettings rgba-order rgb
-    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
-    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":0" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+    sudo -u "$DH_USER_NAME" DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+    sudo -u "$DH_USER_NAME" DISPLAY=":0" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
     # Reapply config to avoid X stubbornness.
     sleep 0.2
-    [ "$DE" != KDE ] && DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
-    [ "$DE" != KDE ] && DISPLAY=":0" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+    DISPLAY=":1" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
+    DISPLAY=":0" xrandr --output DSI-0 --off --output DP-0 $DP_SETTINGS
     if [[ -x $(command -v pactl) ]] && ! pactl --server "$DH_PULSE_SERVER" info | grep -q "^Server Name:.*PipeWire"; then
       sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 1 off
       sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 0 output:hdmi-stereo
@@ -67,12 +64,12 @@ dock_hotplug_handle() {
     # DSI output.
     gsettings set org.gnome.settings-daemon.plugins.xsettings rgba-order vbgr
     sudo -u "$DH_USER_NAME" xinput enable "touchscreen"
-    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":1" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
-    [ "$DE" != KDE ] && sudo -u "$DH_USER_NAME" DISPLAY=":0" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
+    sudo -u "$DH_USER_NAME" DISPLAY=":1" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
+    sudo -u "$DH_USER_NAME" DISPLAY=":0" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
     # Reapply config to avoid X stubbornness.
     sleep 0.2
-    [ "$DE" != KDE ] && DISPLAY=":1" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
-    [ "$DE" != KDE ] && DISPLAY=":0" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
+    DISPLAY=":1" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
+    DISPLAY=":0" xrandr --output DP-0 --off --output DSI-0 $DSI_SETTINGS
     if [[ -x $(command -v pactl) ]] && ! pactl --server "$DH_PULSE_SERVER" info | grep -q "^Server Name:.*PipeWire"; then
       sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 1 HiFi
       sudo -u "$DH_USER_NAME" pactl --server "$DH_PULSE_SERVER" set-card-profile 0 off
