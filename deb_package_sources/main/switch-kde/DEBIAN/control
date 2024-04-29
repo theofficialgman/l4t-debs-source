@@ -1,5 +1,5 @@
 Package: switch-kde
-Version: 1.0-9
+Version: 1.0-10
 Architecture: arm64
 Maintainer: theofficialgman <dofficialgman@gmail.com>
 Depends: plasma-desktop, sddm, switch-sddm-rule, onboard, plasma-discover-backend-flatpak, fuse3, libfuse2

@@ -1,0 +1,5 @@
+set -e
+
+dconf update
+
+exit 0
