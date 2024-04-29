@@ -1,5 +1,5 @@
 Package: switch-unity
-Version: 1.0-4
+Version: 1.0-5
 Architecture: arm64
 Maintainer: theofficialgman <dofficialgman@gmail.com>
 Depends: unity, lightdm, onboard, gnome-software-plugin-flatpak, qt5-gtk2-platformtheme, fuse3, libfuse2
