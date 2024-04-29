@@ -30,8 +30,8 @@ from gi.repository import GObject
 
 INDICATOR_ID = 'nvpmodel'
 INDICATORAPPS_ID = 'nvpmodel_apps'
-ICON_DEFAULT = os.path.abspath('/usr/share/nvpmodel_indicator/nv_logo.svg')
-ICON_SHADOW = os.path.abspath('/usr/share/nvpmodel_indicator/1px.svg')
+ICON_DEFAULT = os.path.abspath('/usr/share/nvpmodel_indicator/nvpmodel-switch.svg')
+ICON_SHADOW = os.path.abspath('/usr/share/nvpmodel_indicator/nvpmodel-profiles.svg')
 JOYCON_MAP = os.path.abspath('/usr/share/nvpmodel_indicator/jc_map.png')
 
 nvpmodel_helper_path = "/usr/share/nvpmodel_indicator/nvpmodel_helper.sh"
