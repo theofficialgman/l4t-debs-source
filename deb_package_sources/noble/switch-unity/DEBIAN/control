@@ -1,8 +1,8 @@
 Package: switch-unity
-Version: 1.0-7
+Version: 1.0-8
 Architecture: arm64
 Maintainer: theofficialgman <dofficialgman@gmail.com>
-Depends: unity, lightdm, onboard, gnome-software-plugin-flatpak, qt5-gtk2-platformtheme, fuse3, libfuse2
+Depends: unity, lightdm, onboard, gnome-software-plugin-flatpak, qt5-gtk2-platformtheme, qt6-gtk2-platformtheme, fuse3, libfuse2
 Conflicts: gnome-software-plugin-snap
 Section: embedded
 Priority: required
