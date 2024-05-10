@@ -1,8 +1,7 @@
 Package: switch-dock-handler
-Version: 2.1-8
+Version: 2.2-1
 Architecture: all
-Maintainer: CTCaer <ctcaer@gmail.com>
-Changed-By: theofficialgman <dofficialgman@gmail.com>
+Maintainer: theofficialgman <dofficialgman@gmail.com>
 Depends: x11-xserver-utils, pulseaudio-utils, v4l-utils
 Section: embedded
 Priority: required

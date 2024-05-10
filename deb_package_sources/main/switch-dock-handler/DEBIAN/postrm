@@ -1,0 +1,10 @@
+#!/bin/bash
+
+divert() {
+    dpkg-divert --package switch-dock-handler --remove --rename --divert "${1}.orig" "$1"
+}
+
+if [ remove = "$1" -o abort-install = "$1" -o disappear = "$1" ] || ( [ abort-upgrade = "$1" ] && dpkg --compare-versions "$2" lt 2.2-1 ); then
+    divert /etc/udev/rules.d/90-alsa-asound-tegra.rules
+    divert /etc/udev/rules.d/92-hdmi-audio-tegra.rules
+fi
