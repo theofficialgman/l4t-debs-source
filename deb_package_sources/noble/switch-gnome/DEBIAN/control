@@ -1,8 +1,8 @@
 Package: switch-gnome
-Version: 1.0-6+24.04~1
+Version: 1.0-6+24.04
 Architecture: arm64
 Maintainer: theofficialgman <dofficialgman@gmail.com>
-Depends: gnome-shell, gnome-software-plugin-flatpak, qt5-gtk2-platformtheme, qt6-gtk2-platformtheme, fuse3, libfuse2
+Depends: gnome-shell, gnome-software-plugin-flatpak, qt5-gtk2-platformtheme, qt6-gtk2-platformtheme, fuse3, libfuse2, wireplumber, pipewire, pipewire-audio
 Conflicts: gnome-software-plugin-snap
 Section: embedded
 Priority: required
