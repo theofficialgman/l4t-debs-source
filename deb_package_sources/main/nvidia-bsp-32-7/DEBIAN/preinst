@@ -1,8 +1,9 @@
 #!/bin/bash
 
-if [ upgrade != "$1" ] || dpkg --compare-versions "$2" lt 1.0-8; then
+if [ upgrade != "$1" ] || dpkg --compare-versions "$2" lt 1.0-10; then
     dpkg-divert --package nvidia-bsp-32-7 --add --rename --divert /etc/apt/preferences.d/00-switch-bsp-restrictions.orig /etc/apt/preferences.d/00-switch-bsp-restrictions
     dpkg-divert --package nvidia-bsp-32-7 --add --rename --divert /usr/lib/aarch64-linux-gnu/tegra/libdrm.orig /usr/lib/aarch64-linux-gnu/tegra/libdrm.so.2
     dpkg-divert --package nvidia-bsp-32-7 --add --rename --divert /usr/lib/aarch64-linux-gnu/libdrm_nvdc.orig /usr/lib/aarch64-linux-gnu/libdrm_nvdc.so
+    dpkg-divert --package nvidia-bsp-32-7 --add --rename --divert /lib/firmware/gm20b/acr_ucode.bin.orig /lib/firmware/gm20b/acr_ucode.bin
     ldconfig
 fi
