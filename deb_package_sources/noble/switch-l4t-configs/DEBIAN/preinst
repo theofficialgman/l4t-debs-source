@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# only run on old images
+if ([ upgrade = "$1" ] && dpkg --compare-versions "$2" lt 1.5-14+24.04 ); then
+    # iputils-ping
+    if [ -f /bin/ping ]; then
+        PROGRAM=$(dpkg-divert --truename /bin/ping)
+        if setcap cap_net_raw+ep $PROGRAM; then
+            chmod u-s $PROGRAM
+        fi
+    fi
+    # kinit
+    if [ -f /usr/lib/aarch64-linux-gnu/libexec/kf5/start_kdeinit ]; then
+        if command -v setcap > /dev/null && \
+        setcap "CAP_SYS_RESOURCE=+ep" \
+                "/usr/lib/aarch64-linux-gnu/libexec/kf5/start_kdeinit"; then
+            echo "Sucessfully set capabilities for start_kdeinit"
+        else
+            echo "Failed to set capabilities for start_kdeinit" >&2
+        fi
+    fi
+    # kwin-wayland
+    if [ -f /usr/bin/kwin_wayland ]; then
+        if command -v setcap > /dev/null && \
+        setcap "CAP_SYS_RESOURCE=+ep" \
+                /usr/bin/kwin_wayland; then
+            echo "Sucessfully set capabilities for kwin_wayland"
+        else
+            echo "Failed to set capabilities for kwin_wayland" >&2
+        fi
+    fi
+    # libgstreamer1.0-0
+    if [ -f /usr/lib/aarch64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-ptp-helper ]; then
+        # If we have setcap is installed, try setting cap_net_bind_service,cap_net_admin+ep,
+        # which allows us to install our helper binary without the setuid bit.
+        if command -v setcap > /dev/null; then
+            if setcap cap_sys_nice,cap_net_bind_service,cap_net_admin+ep /usr/lib/aarch64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-ptp-helper; then
+                echo "Setcap worked! gst-ptp-helper is not suid!"
+            else
+                echo "Setcap failed on gst-ptp-helper, falling back to setuid" >&2
+                chmod u+s /usr/lib/aarch64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-ptp-helper
+            fi
+        else
+            echo "Setcap is not installed, falling back to setuid" >&2
+            chmod u+s /usr/lib/aarch64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-ptp-helper
+        fi
+    fi
+    # libkf5sysguard-bin
+    if [ -f /usr/lib/aarch64-linux-gnu/libexec/ksysguard/ksgrd_network_helper ]; then
+        if command -v setcap > /dev/null && \
+        setcap "CAP_NET_RAW=+ep" \
+                "/usr/lib/aarch64-linux-gnu/libexec/ksysguard/ksgrd_network_helper"; then
+            echo "Sucessfully set capabilities for ksgrd_network_helper"
+        else
+            echo "Failed to set capabilities for ksgrd_network_helper" >&2
+        fi
+    fi
+    # mtr-tiny
+    if [ -f /usr/bin/mtr-packet ]; then
+        if command -v setcap > /dev/null; then
+            if ! setcap cap_net_raw+ep /usr/bin/mtr-packet; then
+                echo "Setcap failed on /usr/bin/mtr-packet, falling back to setuid" >&2
+                chmod u+s /usr/bin/mtr-packet
+            fi
+        else
+            echo "Setcap is not installed, falling back to setuid" >&2
+            chmod u+s /usr/bin/mtr-packet
+        fi
+    fi
+    # powerdevil
+    if [ -f /usr/lib/aarch64-linux-gnu/libexec/org_kde_powerdevil ]; then
+        if command -v setcap > /dev/null && \
+        setcap "CAP_WAKE_ALARM=+ep" \
+                "/usr/lib/aarch64-linux-gnu/libexec/org_kde_powerdevil"; then
+            echo "Sucessfully set capabilities for powerdevil"
+        else
+            echo "Failed to set capabilities for powerdevil" >&2
+        fi
+    fi
+fi
