@@ -1,0 +1,11 @@
+Package: nvidia-l4t-init
+Version: 32.7.4-20230608212426
+Architecture: arm64
+Maintainer: NVIDIA Corporation
+Installed-Size: 16689
+Pre-Depends: nvidia-l4t-core (>> 32.7-0), nvidia-l4t-core (<< 32.8-0)
+Depends: libc6, libstdc++6
+Section: admin
+Priority: standard
+Homepage: http://developer.nvidia.com/jetson
+Description: NVIDIA Init debian package
