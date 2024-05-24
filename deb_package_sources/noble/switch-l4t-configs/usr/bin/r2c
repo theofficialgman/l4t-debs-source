@@ -2,11 +2,15 @@
 
 error() { #red text and exit 1
 	echo -e "\e[91m$1\e[0m" 1>&2
+	[ ! -z "${PKEXEC_UID}" ] && HOME="/home/$(id -nu $PKEXEC_UID)"
 	yad --class Reboot-To-Config --name "Reboot 2 Config" \
 		--no-escape --fixed --show-uri --center --image "dialog-error" --borders="20" --title "ERROR" \
 		--text="$1" --wrap \
 		--window-icon="/usr/share/nvpmodel_indicator/nv_logo.svg" \
 		--button="Exit":0
+	# yad creates a yad.conf file on startup if not previously present. always correct its permissions to user owned.
+	[ ! -z "${PKEXEC_UID}" ] && chmod 644 "/home/$(id -nu $PKEXEC_UID)/.config/yad.conf" && chown "$(id -nu $PKEXEC_UID)":"$(id -nu $PKEXEC_UID)" "/home/$(id -nu $PKEXEC_UID)/.config/yad.conf"
+	[ ! -z "${SUDO_USER}" ] && [ -f "/home/$SUDO_USER/.config/yad.conf" ] && chmod 644 "/home/$SUDO_USER/.config/yad.conf" && chown "${SUDO_USER}":"${SUDO_USER}" "/home/$SUDO_USER/.config/yad.conf"
 	exit 1
 }
 
@@ -45,7 +49,7 @@ gui() {
 	[ -z "$button1" ] && button1="Back"
 	[ -z "$button2" ] && button2="Reboot"
 	INDEX=$(
-		yad --class Reboot-To-Config --name "Reboot 2 Config" \
+		[ ! -z "${PKEXEC_UID}" ] && HOME="/home/$(id -nu $PKEXEC_UID)"; yad --class Reboot-To-Config --name "Reboot 2 Config" \
 			--sticky --on-top --fixed \
 			--center \
 			--width="600" \
@@ -67,6 +71,9 @@ gui() {
 			--button="$button2":0
 	)
 	return_code="$?"
+	# yad creates a yad.conf file on startup if not previously present. always correct its permissions to user owned.
+	[ ! -z "${PKEXEC_UID}" ] && chmod 644 "/home/$(id -nu $PKEXEC_UID)/.config/yad.conf" && chown "$(id -nu $PKEXEC_UID)":"$(id -nu $PKEXEC_UID)" "/home/$(id -nu $PKEXEC_UID)/.config/yad.conf"
+	[ ! -z "${SUDO_USER}" ] && [ -f "/home/$SUDO_USER/.config/yad.conf" ] && chmod 644 "/home/$SUDO_USER/.config/yad.conf" && chown "${SUDO_USER}":"${SUDO_USER}" "/home/$SUDO_USER/.config/yad.conf"
 	unset button1
 	unset button2
 }
