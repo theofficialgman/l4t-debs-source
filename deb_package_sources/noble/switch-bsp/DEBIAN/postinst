@@ -53,6 +53,9 @@ set -e
 echo "Extracting kernel modules and firmware" >&2
 rm -r /lib/modules/* || true
 tar --keep-directory-symlink -zxpf /${BOOTSTACK}/modules.tar.gz -C /lib/
+# Fix symlinks for kernel sources.
+ln -s /usr/src/linux-headers-4.9.140-l4t /lib/modules/4.9.140-l4t/build
+ln -s /usr/src/linux-headers-4.9.140-l4t /lib/modules/4.9.140-l4t/source
 
 # Remove NV Camera (CSI bus) service.
 rm -f /etc/systemd/system/multi-user.target.wants/nvargus-daemon.service || true

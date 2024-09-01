@@ -1,10 +1,12 @@
 Package: switch-bsp
-Version: 5.1.2-19+24.04
+Version: 5.1.2-20+24.04
 Architecture: all
 Maintainer: CTCaer <ctcaer@gmail.com>
 Changed-By: theofficialgman <dofficialgman@gmail.com>
 Pre-Depends: nvidia-bsp-32-3 | nvidia-bsp-32-7
-Suggests: switch-kernel-headers
+Breaks: switch-kernel-headers
+Replaces: switch-kernel-headers
+Provides: switch-kernel-headers, linux-headers
 Section: embedded
 Priority: required
 Homepage: https://gitlab.com/switchroot
