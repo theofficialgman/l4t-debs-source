@@ -73,9 +73,17 @@ echo "/usr/sbin/nvphsd" > /etc/apport/blacklist.d/nvphs
 echo "/usr/sbin/nvpmodel" > /etc/apport/blacklist.d/nvpmodel
 
 # Correct machine-id if needed
-if [ "$(cat /etc/machine-id)" != "$(cat /var/lib/dbus/machine-id)" ] && [ ! -z "$(cat /etc/machine-id)" ] ; then
+machine_id_etc="$(cat /etc/machine-id || true)"
+machine_id_dbus="$(cat /var/lib/dbus/machine-id || true)"
+if [ ! -f /etc/machine-id ] || [ ! -f /var/lib/dbus/machine-id ] || [ "$machine_id_etc" != "$machine_id_dbus" ]; then
 	rm -f /var/lib/dbus/machine-id
-	ln -s /etc/machine-id /var/lib/dbus/machine-id
+	truncate --size 0 /etc/machine-id
+elif [[ "$machine_id_etc" =~ ^(8b2dd9e3dfdf44b588949d20be3dcd33|5ef74e4501d61706afe59b5f66078960|4d5877d679570d3642aa5ee765bc1d43)$  ]]; then
+	rm -f /var/lib/dbus/machine-id
+	truncate --size 0 /etc/machine-id
+elif [[ "$machine_id_dbus" =~ ^(8b2dd9e3dfdf44b588949d20be3dcd33|5ef74e4501d61706afe59b5f66078960|4d5877d679570d3642aa5ee765bc1d43)$  ]]; then
+	rm -f /var/lib/dbus/machine-id
+	truncate --size 0 /etc/machine-id
 fi
 
 SWR_VER=$(cat /etc/switchroot_version.conf)
