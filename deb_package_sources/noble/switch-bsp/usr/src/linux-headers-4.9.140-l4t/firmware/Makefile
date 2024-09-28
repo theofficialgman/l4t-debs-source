@@ -141,6 +141,20 @@ fw-shipped-m += brcm/BCM4356A3.hcd
 endif
 ifdef CONFIG_BRCMFMAC_PCIE
 fw-shipped-m += brcm/brcmfmac4356A3-pcie.bin
+fw-shipped-m += brcm/brcmfmac4356A3-pcie.txt
+endif
+ifdef CONFIG_USB_XHCI_TEGRA
+fw-shipped-m += tegra21x_xusb_firmware
+fw-shipped-m += tegra210b01_xusb_firmware
+endif
+ifdef CONFIG_BCM4354
+fw-shipped-m += bcm4354.hcd
+endif
+ifdef CONFIG_ARCH_TEGRA
+fw-shipped-m += tegra21x/nvhost_tsec.fw
+endif
+ifdef CONFIG_TEGRA_NVADSP
+fw-shipped-m += adsp.elf
 endif
 
 fw-shipped-all := $(fw-shipped-y) $(fw-shipped-m) $(fw-shipped-)
