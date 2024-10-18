@@ -4,7 +4,7 @@ divert() {
     dpkg-divert --package switch-bsp --add --rename --divert "${1}.orig" "$1"
 }
 
-if [ upgrade != "$1" ] || dpkg --compare-versions "$2" lt 5.1.2-12; then
+if [ upgrade != "$1" ] || dpkg --compare-versions "$2" lt 5.1.2-24; then
     divert /etc/nv_boot_control.conf
     divert /etc/xdg/autostart/nvbackground.desktop
     divert /etc/xdg/autostart/nvbackground.sh
@@ -25,6 +25,7 @@ if [ upgrade != "$1" ] || dpkg --compare-versions "$2" lt 5.1.2-12; then
     divert /opt/nvidia/l4t-bootloader-config/nv-l4t-bootloader-config.sh
     divert /opt/nvidia/l4t-usb-device-mode/nv-l4t-usb-device-mode-runtime-start.sh
     divert /opt/nvidia/l4t-usb-device-mode/nv-l4t-usb-device-mode-start.sh
+    divert /opt/nvidia/l4t-usb-device-mode/filesystem.img    
     divert /usr/share/backgrounds/NVIDIA_Login_Logo.png
     divert /usr/share/backgrounds/NVIDIA_Logo.png
     divert /usr/share/unity-control-center/ui/UbuntuLogo.png
