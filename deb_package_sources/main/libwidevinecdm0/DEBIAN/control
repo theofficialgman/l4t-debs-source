@@ -1,0 +1,11 @@
+Package: libwidevinecdm0
+Source: widevine
+Version: 4.10.2662.3+1
+Architecture: arm64
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Depends: libc6 (>= 2.34), libnspr4 (>= 2:4.9-2~)
+Section: libs
+Priority: optional
+Homepage: https://www.widevine.com/
+Description: Widevine CDM
+ Widevine is a proprietary digital rights management (DRM) technology
