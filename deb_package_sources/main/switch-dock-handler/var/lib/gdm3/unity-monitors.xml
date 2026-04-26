@@ -5,12 +5,12 @@
           <vendor>???</vendor>
           <product>0x0000</product>
           <serial>0x00000000</serial>
-          <width>720</width>
-          <height>1280</height>
+          <width>1280</width>
+          <height>720</height>
           <rate>60</rate>
           <x>0</x>
           <y>0</y>
-          <rotation>left</rotation>
+          <rotation>normal</rotation>
           <reflect_x>no</reflect_x>
           <reflect_y>no</reflect_y>
           <primary>yes</primary>

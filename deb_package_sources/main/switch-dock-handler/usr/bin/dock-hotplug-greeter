@@ -21,7 +21,7 @@ dock_hotplug_handle() {
 
   # Set xorg vars.
   export DP_SETTINGS=
-  export DSI_SETTINGS="--primary --mode 720x1280 --rotate left --panning 1280x720+0+0 --pos 0x0 --fb 1280x720"
+  export DSI_SETTINGS="--primary --mode 1280x720 --panning 1280x720+0+0 --pos 0x0 --fb 1280x720"
   export XAUTHORITY=$(ps -C Xorg -f --no-header | sed -n 's/.*-auth //; s/ -[^ ].*//; p')
 
   # Set DP output vars.
@@ -77,9 +77,6 @@ dock_hotplug_handle() {
       sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl set-default $(sudo -u "$DH_USER_NAME" XDG_RUNTIME_DIR="$DH_XDG_RUNTIME_DIR" wpctl status | grep "Built-in Audio Speaker playback + Headphones playback" | grep "\d+" -Po | head -n 1)
     fi
   fi
-
-  # On dock touch is still rotated, so we rotate it the same amount.
-  xinput set-prop "touchscreen" --type=float "Coordinate Transformation Matrix" 0 -1 1 1 0 0 0 0 1
 
   # Execute custom dock-hotplug.sh.
   # This can override everything. All env vars are passed over because of exporting.

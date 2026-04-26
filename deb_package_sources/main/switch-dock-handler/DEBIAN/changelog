@@ -1,3 +1,9 @@
+switch-dock-handler (3.0-1) jammy; urgency=medium
+
+  * Switch to normal rotation for DSI (handheld) panel to match new rotation kernel feature
+
+ -- theofficialgman <dofficialgman@gmail.com>  Sat, 04 Apr 2026 15:11:00 -0400
+
 switch-dock-handler (2.2-1) jammy; urgency=medium
 
   * Remove manual ALSA setting

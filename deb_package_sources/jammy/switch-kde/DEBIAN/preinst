@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# cleanup kscreen cache to avoid potential issues after upgrade, such as wrong display configuration.
+if [ upgrade != "$1" ] || dpkg --compare-versions "$2" lt 1.0-11; then
+  rm -rf /home/*/.local/share/kscreen
+fi
+
+true

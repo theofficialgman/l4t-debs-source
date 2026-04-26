@@ -1,0 +1,10 @@
+Package: switch-touch-rules
+Version: 2.0
+Architecture: all
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Installed-Size: 13
+Depends: udev, libinput10
+Section: unknown
+Priority: optional
+Homepage: https://gitlab.com/switchroot
+Description: Dummy deb that previously housed Udev rules to rotate touchscreen on the Nintendo Switch. No longer required with latest kernel.

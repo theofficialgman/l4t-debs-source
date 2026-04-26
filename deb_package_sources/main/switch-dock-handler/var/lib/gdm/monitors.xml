@@ -6,7 +6,7 @@
       <y>0</y>
       <primary>yes</primary>
       <transform>
-        <rotation>left</rotation>
+        <rotation>normal</rotation>
         <flipped>no</flipped>
       </transform>
       <monitor>
