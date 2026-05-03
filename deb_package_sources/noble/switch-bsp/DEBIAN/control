@@ -1,10 +1,10 @@
 Package: switch-bsp
-Version: 5.1.2-28+24.04
+Version: 5.1.2-30+24.04
 Architecture: all
 Maintainer: CTCaer <ctcaer@gmail.com>
 Changed-By: theofficialgman <dofficialgman@gmail.com>
 Pre-Depends: nvidia-bsp-32-3 | nvidia-bsp-32-7
-Breaks: switch-kernel-headers
+Breaks: switch-kernel-headers, switch-kde (<< 1.0-11), switch-unity (<< 1.0-9), switch-touch-rules (<< 2.0), switch-dock-handler (<< 3.0-1)
 Replaces: switch-kernel-headers
 Provides: switch-kernel-headers, linux-headers
 Section: embedded

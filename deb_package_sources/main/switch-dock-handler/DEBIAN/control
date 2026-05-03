@@ -1,5 +1,5 @@
 Package: switch-dock-handler
-Version: 3.0-1
+Version: 3.0-2
 Architecture: all
 Maintainer: theofficialgman <dofficialgman@gmail.com>
 Depends: x11-xserver-utils, pulseaudio-utils, v4l-utils
