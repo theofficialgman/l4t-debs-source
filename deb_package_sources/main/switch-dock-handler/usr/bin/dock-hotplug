@@ -26,19 +26,25 @@ dock_hotplug_handle() {
 
   # Set DP output vars.
   if [[ "$1" -eq 1 ]]; then
+    export DP_MODE=
     # Read custom WIDTHxHEIGHT from dock-hotplug.conf.
     if [ -e "/etc/dock-hotplug.conf" ]; then
-      export DP_SETTINGS=$(cat /etc/dock-hotplug.conf)
+      DP_SETTINGS=$(cat /etc/dock-hotplug.conf)
+      # Don't want to change the config file format to add mode IDs.
+      # Even if possible, it's a bad idea since they're ephemeral and change between monitors.
+      DP_MODE="$DP_SETTINGS"
     fi
-    # No custom res, set max.
+    # No custom res, use current resolution and mode.
     if [ "$DP_SETTINGS" == "" ]; then
       DP_SETTINGS=$(xrandr -q | sed -E -n '/DP-0/s/.* ([0-9]+x[0-9]+)\+.*/\1/p')
+      # Both detected and user-generated modes have non-unique names but unique hexadecimal IDs.
+      DP_MODE=$(xrandr --verbose | sed -E -n '/DP-0/s/^[^(]+\((0x[0-9a-fA-F]+)\).*/\1/p')
     fi
     # If res found set it, otherwise auto. It's impossible to reach auto, but just in case.
     if [ "$DP_SETTINGS" == "" ]; then
-      export DP_SETTINGS="--primary --auto"
+      DP_SETTINGS="--primary --auto"
     else
-      export DP_SETTINGS="--primary --mode "$DP_SETTINGS" --panning "$DP_SETTINGS"+0+0 --pos 0x0 --fb "$DP_SETTINGS""
+      DP_SETTINGS="--primary --mode $DP_MODE --panning ${DP_SETTINGS}+0+0 --pos 0x0 --fb $DP_SETTINGS"
     fi
   fi
 
