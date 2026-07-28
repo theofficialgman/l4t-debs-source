@@ -27,7 +27,7 @@ dock_hotplug_handle() {
   # Set DP output vars.
   if [[ "$1" -eq 1 ]]; then
     # Wait for kscreen to set monitor state, and do it ourselves if it hasn't changed.
-    sleep 0.5
+    sleep 0.65
     # Read custom WIDTHxHEIGHT from dock-hotplug.conf.
     if [ -e "/etc/dock-hotplug.conf" ]; then
       DP_SETTINGS=$(cat /etc/dock-hotplug.conf)
