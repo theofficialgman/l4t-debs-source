@@ -190,6 +190,7 @@ deps_config := \
 	/home/garrett/l4t-kernel-build-scripts/kernel/nvidia/drivers/iio/imu/nvs_bmi/Kconfig \
 	/home/garrett/l4t-kernel-build-scripts/kernel/nvidia/drivers/iio/imu/nvi_mpu/Kconfig \
 	/home/garrett/l4t-kernel-build-scripts/kernel/nvidia/drivers/iio/imu/Kconfig \
+	drivers/iio/imu/inv_icm42607x/Kconfig \
 	drivers/iio/imu/st_lsm6dsx/Kconfig \
 	drivers/iio/imu/inv_mpu6050/Kconfig \
 	drivers/iio/imu/inv_icm42600/Kconfig \
