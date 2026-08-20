@@ -26,19 +26,21 @@ dock_hotplug_handle() {
 
   # Set DP output vars.
   if [[ "$1" -eq 1 ]]; then
+    # Wait for kscreen to set monitor state, and do it ourselves if it hasn't changed.
+    sleep 0.65
     # Read custom WIDTHxHEIGHT from dock-hotplug.conf.
     if [ -e "/etc/dock-hotplug.conf" ]; then
-      export DP_SETTINGS=$(cat /etc/dock-hotplug.conf)
-    fi
-    # No custom res, set max.
-    if [ "$DP_SETTINGS" == "" ]; then
-      DP_SETTINGS=$(xrandr -q | sed -E -n '/DP-0/s/.* ([0-9]+x[0-9]+)\+.*/\1/p')
-    fi
-    # If res found set it, otherwise auto. It's impossible to reach auto, but just in case.
-    if [ "$DP_SETTINGS" == "" ]; then
-      export DP_SETTINGS="--primary --auto"
+      DP_SETTINGS=$(cat /etc/dock-hotplug.conf)
+      # Unconditionally set user-specified mode.
+      DP_SETTINGS="--primary --mode $DP_SETTINGS --panning ${DP_SETTINGS}+0+0 --pos 0x0 --fb $DP_SETTINGS"
+
+    # No custom res. Check if monitor is enabled, only set mode if not.
+    elif [ "$(xrandr -q | sed -E -n '/DP-0/s/.* ([0-9]+x[0-9]+)\+.*/\1/p')" == "" ]; then
+      # If disabled (and no resolution present), enable with default resolution.
+      DP_SETTINGS="--primary --auto --pos 0x0"
     else
-      export DP_SETTINGS="--primary --mode "$DP_SETTINGS" --panning "$DP_SETTINGS"+0+0 --pos 0x0 --fb "$DP_SETTINGS""
+      # If already enabled, don't touch the user's settings.
+      DP_SETTINGS="--primary --pos 0x0"
     fi
   fi
 
