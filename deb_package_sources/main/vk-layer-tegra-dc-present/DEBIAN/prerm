@@ -1,0 +1,11 @@
+#!/bin/sh
+
+REF=org.freedesktop.Platform.GL.VK_LAYER_TEGRA_dc_present
+BRANCH=1.4
+
+if [ "$1" = remove ] && command -v flatpak > /dev/null; then
+	flatpak pin --system --remove "runtime/$REF/aarch64/$BRANCH" || true
+	flatpak uninstall --system -y "$REF//$BRANCH" || true
+fi
+
+exit 0

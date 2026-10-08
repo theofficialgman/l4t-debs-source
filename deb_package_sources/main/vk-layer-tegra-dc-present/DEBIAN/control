@@ -1,0 +1,9 @@
+Package: vk-layer-tegra-dc-present
+Version: 1.0-0
+Architecture: arm64
+Maintainer: theofficialgman <dofficialgman@gmail.com>
+Depends: libc6 (>= 2.34)
+Section: embedded
+Priority: optional
+Homepage: https://github.com/theofficialgman/vk_layer_tegra_dc_present
+Description: vulkan implicit layer to workaround broken vulkan vsync on Nvidia Tegra/Jetson BSP

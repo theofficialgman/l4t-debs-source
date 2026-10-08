@@ -1,0 +1,2 @@
+Defaults      env_keep += "VK_TEGRA_DC_PRESENT_*"
+Defaults      env_keep += FLATPAK_GL_DRIVERS

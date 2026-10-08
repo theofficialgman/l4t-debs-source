@@ -1,0 +1,14 @@
+#!/bin/sh
+
+REF=org.freedesktop.Platform.GL.VK_LAYER_TEGRA_dc_present
+BRANCH=1.4
+
+if [ "$1" = configure ] && command -v flatpak > /dev/null; then
+	if flatpak info --system "$REF//$BRANCH" > /dev/null 2>&1; then
+		flatpak uninstall --system -y "$REF//$BRANCH" || true
+	fi
+	flatpak install --system -y /opt/switchroot/flatpak/$REF.flatpak || true
+	flatpak pin --system "runtime/$REF/aarch64/$BRANCH" || true
+fi
+
+exit 0
