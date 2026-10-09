@@ -4,4 +4,8 @@ glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 dconf update
 
+if [ upgrade != "$1" ] || dpkg --compare-versions "$2" lt 1.0-15+24.04; then
+    sed -i 's/WindowsBlockCompositing=false/WindowsBlockCompositing=true/g' /home/*/.config/kwinrc || true
+fi
+
 exit 0
